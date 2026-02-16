@@ -16,7 +16,7 @@ def best_fit_allocate(request_size, memory_map,process_id):
    for block in memory_map: 
       # if the process id is 0, then it is a free block 
       # check if segment is larger than request size 
-      if block["process_id"] == 0 and block["segment_size"] >= request_size and not found:
+      if block["process_id"] == 0 and block["segment_size"] >= request_size:
          found = True
          candidate_blocks.append(block)
     
@@ -24,100 +24,57 @@ def best_fit_allocate(request_size, memory_map,process_id):
    if not found: 
       return setup_memory_block(0, 0, 0, 0)
    
-   print("Candidate blocks!")
+   smallest_segment_block = candidate_blocks[0]
+   for block in candidate_blocks:
+      # if segment_size is smaller than what is in smallest_segment_block 
+      # then update to be that block
+      if block["segment_size"] < smallest_segment_block["segment_size"]:
+         smallest_segment_block = block 
+   print("Candidate blocks")
    for block in candidate_blocks:
       print(block)
    print()
-
-   # chooses the one whose size is closest to requested size 
-   # put the first block in the chosen block as a placeholder/reference point 
-   chosen_block = candidate_blocks[0]
-   print("Chosen block")
-   print(chosen_block)
+   # at this point, the smallest_segment block has been selected
+   print("Smallest segment size block: ")
+   print(smallest_segment_block)
    print()
-   closet_size = chosen_block["segment_size"] - request_size
-   for block in candidate_blocks:
-      # if the segment size is the same,
-      # chosen block's process id is updated to be process id 
-      # return this block 
-      if chosen_block["segment_size"] == request_size:
-         chosen_block["process_id"] = process_id
-         return chosen_block
-      # segment size is different than request size 
-      else:
-         # see if block segment size difference is smaller than current closet size 
-         if (chosen_block["segment_size"]) < closet_size: 
-            chosen_block = block 
-            closet_size = chosen_block["segment_size"] - request_size
+
+   # smallest_segment_block is the same size as request size 
+   if smallest_segment_block["segment_size"] == request_size:
+        smallest_segment_block["process_id"] = process_id
+        # update memory block 
+        for block in memory_map:
+           if block == smallest_segment_block:
+              memory_map[block] = smallest_segment_block
+        return smallest_segment_block
 
     # at this point, you have a memory block available for the request (chosen_block)
     # the segment size is bigger than the request, so it needs to be split
 
-#    new_memory_map = []
-#    # loop through memory map to match where chosen_block is to split in that location 
-#    for block in memory_map:
-#       if chosen_block == block:
-#          print("we found the spot!")
-#          # split the block here before appending
-#             # create a new block to append to memory map  
-#             # second piece becomes free block in memory map 
-#          free_memory_block = setup_memory_block(chosen_block["start_address"] + request_size,
-#                                                     chosen_block["end_address"],
-#                                                     chosen_block["end_address"] - (chosen_block["start_address"] + request_size) + 1, 
-#                                                     0)
-#             # allocate the first piece 
-#             # start_address remains the same 
-#             # end_address is start_address + request_size - 1 
-#          chosen_block["end_address"] = chosen_block["start_address"] + request_size - 1
-#             # segment_size is the request_size 
-#          chosen_block["segment_size"] = request_size
-#             # process_id is the process_id
-#          chosen_block["process_id"] = process_id
-#          new_memory_map.append("chosen block ->")
-#          new_memory_map.append(chosen_block)
-#          new_memory_map.append("free memory ->")
-#          new_memory_map.append(free_memory_block)
-#       else:
-#         new_memory_map.append(block)
-    
-
-   
-#    print("here is the new memory map:")
-#    for block in new_memory_map:
-#       print(block)
-#    memory_map = new_memory_map
-
-   # if free_block is exactly same size as requested size
-   if chosen_block["segment_size"] == request_size:
-      # free_block process_id is updated to be the process_id 
-      chosen_block["process_id"] = process_id
-      # memory map is updated 
-      for block in memory_map:
-         if block == chosen_block:
-            block = chosen_block
-      # return free block 
-      return chosen_block
-   elif chosen_block["segment_size"] > request_size:
+   elif smallest_segment_block["segment_size"] > request_size:
    # if free_block is larger than requested size 
    # block split into two pieces 
    # first piece allocated to the requested process 
 
    # second piece becomes a free block in memory map 
-      second_memory_piece = setup_memory_block(chosen_block["start_address"] + request_size, chosen_block["end_address"], \
-                                            chosen_block["end_address"] - (chosen_block["start_address"] + request_size) + 1, 0)
+      second_memory_piece = setup_memory_block(smallest_segment_block["start_address"] + request_size, smallest_segment_block["end_address"], \
+                                            smallest_segment_block["end_address"] - (smallest_segment_block["start_address"] + request_size) + 1, 0)
     # the first piece allocated to requested process 
-      chosen_block["end_address"] = chosen_block["start_address"] + request_size - 1
-      chosen_block["process_id"] = process_id
-      chosen_block["segment_size"] = request_size
+      smallest_segment_block["end_address"] = smallest_segment_block["start_address"] + request_size - 1
+      smallest_segment_block["process_id"] = process_id
+      smallest_segment_block["segment_size"] = request_size
 
    # update memory_map 
    # these two pieces are added to memory map (in same place as block from before)
-      new_block_index = memory_map.index(chosen_block)
-      memory_map[new_block_index] = chosen_block
+      new_block_index = memory_map.index(smallest_segment_block)
+      memory_map[new_block_index] = smallest_segment_block
       memory_map.insert(new_block_index + 1, second_memory_piece)
 
+   for block in memory_map:
+      print(block)
+   print()
     # return memory block
-   return chosen_block
+   return smallest_segment_block
    
         
 
@@ -164,7 +121,7 @@ def worst_fit_allocate(request_size, memory_map,process_id):
    candidate_blocks = []
    # find candidate memory block (process_id = 0) and segment_size >= request size 
    for block in memory_map: 
-      if block["segment_size"] >= request_size and block["process_id"] == 0 and not found:
+      if block["segment_size"] >= request_size and block["process_id"] == 0:
          found = True 
          candidate_blocks.append(block)
 
@@ -211,7 +168,10 @@ def worst_fit_allocate(request_size, memory_map,process_id):
       new_block_index = memory_map.index(largest_segment_block)
       memory_map[new_block_index] = largest_segment_block
       memory_map.insert(new_block_index + 1, second_memory_piece)
-
+   
+   for block in memory_map:
+      print(block)
+   print()
    # returns memory block 
    return largest_segment_block
       
@@ -265,10 +225,6 @@ def next_fit_allocate(request_size, memory_map, process_id, last_address):
       memory_map[new_block_index] = found_block
       memory_map.insert(new_block_index + 1, second_memory_piece)
       
-      print("Memory map")
-      for block in memory_map:
-         print(block)
-      print()
       return found_block 
     
 # releases a memory block, modifying the memory map passed in 
@@ -321,8 +277,6 @@ def release_memory(freed_block, memory_map):
       # remove the free block 
        memory_map.pop(freed_block_index)
 
-   
-   for block in memory_map:
-      print(block)
+
    # method does not have any explicit return value 
    return 

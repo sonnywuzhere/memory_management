@@ -42,13 +42,28 @@ def main():
 
     # test2 = m.best_fit_allocate(20, memory_block3, 40)
     # test3 = m.best_fit_allocate(30, memory_block4, 40)
-    # test4 = m.best_fit_allocate(10, memory_block4, 40)
+    
+    best_fit_allocate_mb4 = [
+        {"start_address": 0, "end_address": 19, "segment_size": 20, "process_id": 0},
+        {"start_address": 20, "end_address": 39, "segment_size": 20, "process_id": 20},
+        {"start_address": 40, "end_address": 54, "segment_size": 15, "process_id": 0},
+        {"start_address": 55, "end_address": 1023, "segment_size": 969, "process_id": 30},   
+    ]
 
-    # worst_fit_allocate_mb1 = [
-    #     {"start_address": 0, "end_address": 1023, "segment_size": 1024, "process_id": 0}
-    # ]
+    print(m.best_fit_allocate(10, best_fit_allocate_mb4, 40))
 
-    # print(m.worst_fit_allocate(10, worst_fit_allocate_mb1, 32))
+    worst_fit_allocate_mb1 = [
+        {"start_address": 0, "end_address": 1023, "segment_size": 1024, "process_id": 0}
+    ]
+
+    worst_fit_allocate_mb4 = [
+        {"start_address": 0, "end_address": 19, "segment_size": 20, "process_id": 0},
+        {"start_address": 20, "end_address": 39, "segment_size": 20, "process_id": 20},
+        {"start_address": 40, "end_address": 54, "segment_size": 15, "process_id": 30},
+        {"start_address": 55, "end_address": 1023, "segment_size": 969, "process_id": 0}, 
+    ]
+
+    # print(m.worst_fit_allocate(10, worst_fit_allocate_mb4, 40))
 
     next_fit_memory_mb1 = [
             {"start_address": 0, "end_address": 1023, "segment_size": 1024, "process_id": 0}
@@ -71,7 +86,7 @@ def main():
         {"start_address": 28, "end_address": 29, "segment_size": 2, "process_id": 11},        
     ]
 
-    print(m.release_memory({"start_address": 16, "end_address": 23, "segment_size": 8, "process_id": 13}, release_memory_mb1))
+    # print(m.release_memory({"start_address": 16, "end_address": 23, "segment_size": 8, "process_id": 13}, release_memory_mb1))
 
 
 main()
