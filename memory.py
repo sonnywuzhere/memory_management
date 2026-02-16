@@ -30,14 +30,7 @@ def best_fit_allocate(request_size, memory_map,process_id):
       # then update to be that block
       if block["segment_size"] < smallest_segment_block["segment_size"]:
          smallest_segment_block = block 
-   print("Candidate blocks")
-   for block in candidate_blocks:
-      print(block)
-   print()
    # at this point, the smallest_segment block has been selected
-   print("Smallest segment size block: ")
-   print(smallest_segment_block)
-   print()
 
    # smallest_segment_block is the same size as request size 
    if smallest_segment_block["segment_size"] == request_size:
@@ -45,7 +38,7 @@ def best_fit_allocate(request_size, memory_map,process_id):
         # update memory block 
         for block in memory_map:
            if block == smallest_segment_block:
-              memory_map[block] = smallest_segment_block
+              block = smallest_segment_block
         return smallest_segment_block
 
     # at this point, you have a memory block available for the request (chosen_block)
@@ -70,9 +63,6 @@ def best_fit_allocate(request_size, memory_map,process_id):
       memory_map[new_block_index] = smallest_segment_block
       memory_map.insert(new_block_index + 1, second_memory_piece)
 
-   for block in memory_map:
-      print(block)
-   print()
     # return memory block
    return smallest_segment_block
    
@@ -169,9 +159,6 @@ def worst_fit_allocate(request_size, memory_map,process_id):
       memory_map[new_block_index] = largest_segment_block
       memory_map.insert(new_block_index + 1, second_memory_piece)
    
-   for block in memory_map:
-      print(block)
-   print()
    # returns memory block 
    return largest_segment_block
       

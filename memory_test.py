@@ -40,9 +40,10 @@ def main():
         {"start_address": 55, "end_address": 1023, "segment_size": 969, "process_id": 30},   
     ]
 
-    # test2 = m.best_fit_allocate(20, memory_block3, 40)
-    # test3 = m.best_fit_allocate(30, memory_block4, 40)
-    
+    test2 = m.best_fit_allocate(20, memory_block3, 40)
+    test3 = m.best_fit_allocate(30, memory_block4, 40)
+    print(test2)
+    print(test3)
     best_fit_allocate_mb4 = [
         {"start_address": 0, "end_address": 19, "segment_size": 20, "process_id": 0},
         {"start_address": 20, "end_address": 39, "segment_size": 20, "process_id": 20},
